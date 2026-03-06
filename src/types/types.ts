@@ -34,6 +34,7 @@ export interface MapState {
   zoom: number;
   bearing: number;
   pitch: number;
+  bounds?: [number, number, number, number]; // [W, S, E, N]
 }
 
 export type MapSource = VectorSource | RasterSource | GoogleMapsSource;

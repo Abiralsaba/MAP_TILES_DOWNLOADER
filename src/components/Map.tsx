@@ -80,6 +80,14 @@ export function Map({
   });
 
   function handleMove(evt: ViewStateChangeEvent) {
+    const b = evt.target.getBounds();
+    const bounds: [number, number, number, number] = [
+      b.getWest(),
+      b.getSouth(),
+      b.getEast(),
+      b.getNorth()
+    ];
+
     const newState: Partial<MapState> = {
       center: [evt.viewState.longitude, evt.viewState.latitude] as [
         number,
@@ -88,6 +96,7 @@ export function Map({
       zoom: evt.viewState.zoom,
       bearing: evt.viewState.bearing,
       pitch: evt.viewState.pitch,
+      bounds: bounds,
     };
 
     if (synchronized) {

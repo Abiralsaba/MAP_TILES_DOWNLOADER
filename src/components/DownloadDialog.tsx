@@ -8,31 +8,43 @@ export function DownloadDialog() {
     const { state, dispatch } = useApp();
     const [name, setName] = useState("");
     const [minZoom, setMinZoom] = useState(14);
-    const [maxZoom, setMaxZoom] = useState(17);
+    const [maxZoom, setMaxZoom] = useState(19);
     const [isDownloading, setIsDownloading] = useState(false);
     const [progress, setProgress] = useState<{ total: number; downloaded: number } | null>(null);
     const [error, setError] = useState("");
 
-    const activePanel = state.panels[0]; // We assume the main panel dictates download logic
+    const activePanel = state.panels[0];
+    const [selectedSourceId, setSelectedSourceId] = useState<string>(activePanel?.sourceId || "satellite-esri");
+
+    useEffect(() => {
+        if (activePanel && !selectedSourceId) {
+            setSelectedSourceId(activePanel.sourceId);
+        }
+    }, [activePanel, selectedSourceId]);
+
     if (!activePanel) return null;
 
-    const source = state.customSources[activePanel.sourceId] ||
-        SATELLITE_SOURCES[activePanel.sourceId] ||
-        GOOGLE_SOURCES[activePanel.sourceId];
+    const source = state.customSources[selectedSourceId] ||
+        SATELLITE_SOURCES[selectedSourceId] ||
+        GOOGLE_SOURCES[selectedSourceId];
 
     if (!source) return null;
 
-    // Derive bounding box (naive approximation for MVP based on viewport center and zoom)
-    // In a real scenario, this uses map.getBounds() which we don't have direct access to without refs.
-    // We'll approximate a +/- 0.05 degree bounds around the center depending on zoom.
     const mapState: MapState = activePanel.synchronized ? state.mapState : (activePanel.localMapState || state.mapState);
-    const offset = 0.02 * Math.pow(2, 12 - mapState.zoom);
-    const bounds: [number, number, number, number] = [
-        mapState.center[0] - offset, // W
-        mapState.center[1] - offset, // S
-        mapState.center[0] + offset, // E
-        mapState.center[1] + offset  // N
-    ];
+
+    // Use exact viewport bounds if available, fallback to a sensible approximation
+    let bounds: [number, number, number, number] = [0, 0, 0, 0];
+    if (mapState.bounds) {
+        bounds = mapState.bounds;
+    } else {
+        const offset = 0.05 * Math.pow(2, 12 - mapState.zoom);
+        bounds = [
+            mapState.center[0] - offset, // W
+            mapState.center[1] - offset, // S
+            mapState.center[0] + offset, // E
+            mapState.center[1] + offset  // N
+        ];
+    }
 
     useEffect(() => {
         if (!isDownloading || !name) return;
@@ -46,7 +58,6 @@ export function DownloadDialog() {
                     setIsDownloading(false);
                     dispatch({ type: "SET_DOWNLOAD_MODE", payload: false });
 
-                    // Auto add the new source
                     if (stats[jobId].status === 'completed') {
                         dispatch({
                             type: "ADD_CUSTOM_SOURCE",
@@ -73,9 +84,7 @@ export function DownloadDialog() {
     const handleDownload = async () => {
         if (!name.trim()) return;
         if (source.type === "google") {
-            // Google sources in this app logic don't expose a simple XYZ url string directly in `.url`
-            // We will error out for now and ask the user to use Satellite options
-            setError("Cannot download directly from Google Maps API sources. Please switch to Google Satellite (No API) or ESRI.");
+            setError("Cannot download directly from Google Maps API sources. Please use 'Google Satellite (No API)' or 'ESRI Satellite'.");
             return;
         }
 
@@ -104,18 +113,24 @@ export function DownloadDialog() {
 
     if (!state.isDownloadMode) return null;
 
+    // Build options for source selector
+    const sourceGroups = [
+        { label: "High Quality Satellites", sources: SATELLITE_SOURCES },
+        { label: "Custom / Local Sets", sources: state.customSources }
+    ];
+
     return (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-                <h2 className="text-xl font-bold mb-4">Download Map Area</h2>
+        <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 relative overflow-y-auto max-h-[90vh]">
+                <h2 className="text-xl font-bold mb-4">Download Exact Map Area</h2>
 
                 {isDownloading ? (
                     <div className="space-y-4">
-                        <p className="font-medium text-slate-700">Downloading your offline map...</p>
+                        <p className="font-medium text-slate-700">Downloading your extremely high quality offline map...</p>
                         {progress && (
                             <div>
                                 <div className="w-full bg-slate-200 rounded-full h-2.5 mb-2">
-                                    <div className="bg-brand h-2.5 rounded-full" style={{ width: `${(progress.downloaded / progress.total) * 100}%` }}></div>
+                                    <div className="bg-brand h-2.5 rounded-full transition-all duration-300" style={{ width: `${(progress.downloaded / progress.total) * 100}%` }}></div>
                                 </div>
                                 <p className="text-sm text-slate-600 text-center">{progress.downloaded} of {progress.total} tiles downloaded</p>
                             </div>
@@ -123,8 +138,8 @@ export function DownloadDialog() {
                     </div>
                 ) : (
                     <div className="space-y-4">
-                        <p className="text-sm text-slate-600">
-                            This will download the exact geographical area currently visible in your primary map panel.
+                        <p className="text-sm text-slate-600 bg-brand/5 p-3 rounded border border-brand/20">
+                            <strong>Note:</strong> The area you currently see inside the main map panel will be exactly what gets downloaded! Pan or zoom the map behind this dialog to adjust the boundaries perfectly.
                         </p>
 
                         <div>
@@ -136,6 +151,27 @@ export function DownloadDialog() {
                                 placeholder="e.g., UIU Mars Setup"
                                 className="w-full p-2 border border-slate-300 rounded focus:border-brand outline-none"
                             />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Choose Source to Download From</label>
+                            <select
+                                value={selectedSourceId}
+                                onChange={(e) => setSelectedSourceId(e.target.value)}
+                                className="w-full p-2 border border-slate-300 rounded focus:border-brand outline-none"
+                            >
+                                {sourceGroups.map(group => (
+                                    Object.keys(group.sources).length > 0 && (
+                                        <optgroup key={group.label} label={group.label}>
+                                            {Object.entries(group.sources).map(([id, src]) => (
+                                                <option key={id} value={id}>
+                                                    {src.name}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    )
+                                ))}
+                            </select>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4">
@@ -160,6 +196,7 @@ export function DownloadDialog() {
                                     max={20}
                                     className="w-full p-2 border border-slate-300 rounded focus:border-brand outline-none"
                                 />
+                                <p className="text-[10px] text-slate-500 mt-1">Set to 19 or 20 for absolute best original quality.</p>
                             </div>
                         </div>
 

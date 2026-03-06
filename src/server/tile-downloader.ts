@@ -97,6 +97,7 @@ export function tileDownloaderPlugin(): Plugin {
                                 while (currentIndex < tilesToDownload.length) {
                                     const index = currentIndex++;
                                     const tile = tilesToDownload[index];
+                                    if (!tile) continue;
 
                                     const zDir = path.join(baseDir, String(tile.z));
                                     const xDir = path.join(zDir, String(tile.x));
@@ -104,23 +105,36 @@ export function tileDownloaderPlugin(): Plugin {
 
                                     const targetPath = path.join(xDir, `${tile.y}.jpg`);
 
+                                    const quadkey = (function tileToQuadkey(tx: number, ty: number, tz: number): string {
+                                        let qk = '';
+                                        for (let i = tz; i > 0; i--) {
+                                            let digit = 0;
+                                            const mask = 1 << (i - 1);
+                                            if ((tx & mask) !== 0) digit += 1;
+                                            if ((ty & mask) !== 0) digit += 2;
+                                            qk += digit.toString();
+                                        }
+                                        return qk;
+                                    })(tile.x, tile.y, tile.z);
+
                                     // Server URL might use {s} for subdomains, simple replacement:
                                     const url = sourceUrl
                                         .replace('{z}', String(tile.z))
                                         .replace('{x}', String(tile.x))
                                         .replace('{y}', String(tile.y))
+                                        .replace('{quadkey}', quadkey)
                                         .replace('{s}', 'a');
 
                                     if (fs.existsSync(targetPath)) {
-                                        downloadState[jobId].downloaded++;
+                                        downloadState[jobId]!.downloaded++;
                                         continue; // Skip existing
                                     }
 
                                     const success = await downloadTile(url, targetPath);
                                     if (success) {
-                                        downloadState[jobId].downloaded++;
+                                        downloadState[jobId]!.downloaded++;
                                     } else {
-                                        downloadState[jobId].failed++;
+                                        downloadState[jobId]!.failed++;
                                     }
                                 }
                             };
@@ -128,7 +142,7 @@ export function tileDownloaderPlugin(): Plugin {
                             const workers = Array(Math.min(CONCURRENCY, tilesToDownload.length)).fill(0).map(() => worker());
                             await Promise.all(workers);
 
-                            downloadState[jobId].status = 'completed';
+                            downloadState[jobId]!.status = 'completed';
                         } catch (err: any) {
                             res.statusCode = 500;
                             res.end(JSON.stringify({ error: err.message }));
