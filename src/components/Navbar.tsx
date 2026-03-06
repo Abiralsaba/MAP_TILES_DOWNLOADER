@@ -3,6 +3,7 @@ import { Toolbar } from "./Toolbar";
 import { CustomSourcesDialog } from "./CustomSourcesDialog";
 import { useApp } from "../contexts/AppContext";
 import { ApiKeysDialog } from "./ApiKeysDialog";
+import { SearchBar } from "./SearchBar";
 
 export function Navbar() {
   const [showCustomSourcesDialog, setShowCustomSourcesDialog] = useState(false);
@@ -26,13 +27,15 @@ export function Navbar() {
       <nav className="bg-white border-b border-slate-200">
         <div className="flex flex-col md:flex-row">
           {/* Title Row (mobile) / Left Section (desktop) */}
-          <div className="h-12 md:h-14 px-4 flex items-center justify-between md:justify-start md:gap-4 border-b md:border-b-0 border-slate-100">
+          <div className="h-12 md:h-14 px-4 flex items-center justify-between md:justify-start md:gap-4 border-b md:border-b-0 border-slate-100 flex-1">
             <div className="flex flex-wrap items-center gap-2 md:gap-4">
               <img src="/logo.png" alt="MARS ROVER MAP" className="w-10 h-10 rounded" />
-              <h1 className="text-lg font-bold text-slate-900 tracking-wide">
+              <h1 className="text-lg font-bold text-slate-900 tracking-wide whitespace-nowrap hidden sm:block">
                 MARS ROVER MAP
               </h1>
             </div>
+
+            <SearchBar />
 
             <a
               className="p-1 rounded hover:opacity-80 md:ml-2"
