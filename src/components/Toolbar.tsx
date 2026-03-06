@@ -29,25 +29,24 @@ export function Toolbar() {
         </select>
       </div>
 
-      {/* Desktop Slider */}
+      {/* Desktop Buttons */}
       <div className="hidden md:flex items-center gap-4">
-        <span className="text-sm font-medium text-slate-700">
-          Panels: {state.layout.boxCount}
-        </span>
-        <input
-          type="range"
-          min="1"
-          max={AVAILABLE_LAYOUTS[AVAILABLE_LAYOUTS.length - 1]}
-          step="1"
-          value={state.layout.boxCount}
-          onChange={(e) => {
-            const val = Number(e.target.value) as BoxCount;
-            if (AVAILABLE_LAYOUTS.includes(val)) {
-              handleLayoutChange(val);
-            }
-          }}
-          className="w-32 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-brand"
-        />
+        <span className="text-sm text-slate-600">Number of panels:</span>
+        <div className="flex gap-1">
+          {AVAILABLE_LAYOUTS.map((count) => (
+            <button
+              key={count}
+              className={`w-8 h-8 flex items-center justify-center rounded transition-colors
+                ${state.layout.boxCount === count
+                  ? "bg-slate-200 text-slate-900 font-medium"
+                  : "text-slate-600 hover:bg-slate-100"
+                }`}
+              onClick={() => handleLayoutChange(count)}
+            >
+              {count}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );

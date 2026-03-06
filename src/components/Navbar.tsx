@@ -7,6 +7,7 @@ import { ApiKeysDialog } from "./ApiKeysDialog";
 export function Navbar() {
   const [showCustomSourcesDialog, setShowCustomSourcesDialog] = useState(false);
   const [showApiKeysDialog, setShowApiKeysDialog] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { dispatch } = useApp();
 
   function handleReset() {
@@ -47,27 +48,58 @@ export function Navbar() {
           </div>
 
           {/* Controls Row (mobile) / Right Section (desktop) */}
-          <div className="h-12 md:h-14 px-4 flex items-center justify-between md:ml-auto md:gap-4">
-            <button
-              onClick={() => setShowApiKeysDialog(true)}
-              className="text-sm px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50"
-            >
-              API Keys
-            </button>
-            <button
-              onClick={() => setShowCustomSourcesDialog(true)}
-              className="text-sm px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50"
-            >
-              <span className="md:inline hidden">Custom Sources</span>
-              <span className="md:hidden">Sources</span>
-            </button>
-            <button
-              onClick={handleReset}
-              className="text-sm px-3 py-1.5 rounded border border-slate-200 hover:bg-slate-50 text-red-600"
-            >
-              Reset
-            </button>
-            <Toolbar />
+          <div className="h-12 md:h-14 px-4 flex items-center justify-between md:ml-auto md:gap-4 relative">
+            <div className="relative">
+              <button
+                onClick={() => setIsMenuOpen(!isMenuOpen)}
+                className="p-2 rounded hover:bg-slate-100 flex items-center gap-2"
+                aria-label="Menu"
+              >
+                <svg className="w-6 h-6 text-slate-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
+
+              {isMenuOpen && (
+                <div className="absolute right-0 mt-2 w-72 bg-white rounded-md shadow-lg py-2 z-50 border border-slate-200">
+                  <div className="px-4 py-3 border-b border-slate-100">
+                    <Toolbar />
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setShowCustomSourcesDialog(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    Custom Sources
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      setShowApiKeysDialog(true);
+                      setIsMenuOpen(false);
+                    }}
+                    className="block w-full text-left px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+                  >
+                    API Keys
+                  </button>
+
+                  <div className="border-t border-slate-100 mt-2 pt-2">
+                    <button
+                      onClick={() => {
+                        handleReset();
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                    >
+                      Reset Everything
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </nav>
