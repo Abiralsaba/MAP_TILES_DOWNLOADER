@@ -27,13 +27,10 @@ export function Navbar() {
           {/* Title Row (mobile) / Left Section (desktop) */}
           <div className="h-12 md:h-14 px-4 flex items-center justify-between md:justify-start md:gap-4 border-b md:border-b-0 border-slate-100">
             <div className="flex flex-wrap items-center gap-2 md:gap-4">
-              <img src="/logo.png" alt="MARS ROVER MAP" className="w-8 h-8 rounded" />
+              <img src="/logo.png" alt="MARS ROVER MAP" className="w-10 h-10 rounded" />
               <h1 className="text-lg font-bold text-slate-900 tracking-wide">
                 MARS ROVER MAP
               </h1>
-              <span className="bg-brand/10 text-brand rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider">
-                created by CODING HERE
-              </span>
             </div>
 
             <a
