@@ -18,6 +18,7 @@ export interface AppState {
   mapState: MapState;
   customSources: Record<string, CustomMapSource>;
   apiKeys?: ApiKeys;
+  isDownloadMode?: boolean;
 }
 
 export interface Panel {

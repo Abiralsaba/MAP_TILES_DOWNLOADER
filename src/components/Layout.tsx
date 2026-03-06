@@ -2,6 +2,7 @@ import { useApp } from "../contexts/AppContext";
 import { MapPanel } from "./MapPanel";
 import { Navbar } from "./Navbar";
 import { GRID_LAYOUTS } from "../constants/layouts";
+import { DownloadDialog } from "./DownloadDialog";
 
 export function Layout() {
   const { state } = useApp();
@@ -23,6 +24,7 @@ export function Layout() {
           ))}
         </div>
       </main>
+      <DownloadDialog />
     </div>
   );
 }

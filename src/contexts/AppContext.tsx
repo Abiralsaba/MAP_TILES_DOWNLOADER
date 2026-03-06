@@ -82,6 +82,7 @@ type Action =
   }
   | { type: "UPDATE_API_KEYS"; payload: ApiKeys }
   | { type: "RESET_STATE" }
+  | { type: "SET_DOWNLOAD_MODE"; payload: boolean }
   | { type: "REMOVE_CUSTOM_SOURCE"; payload: string };
 
 function appReducer(state: AppState, action: Action): AppState {
@@ -193,6 +194,12 @@ function appReducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         apiKeys: action.payload,
+      };
+
+    case "SET_DOWNLOAD_MODE":
+      return {
+        ...state,
+        isDownloadMode: action.payload,
       };
 
     case "RESET_STATE":

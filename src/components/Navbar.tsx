@@ -89,6 +89,18 @@ export function Navbar() {
                   <div className="border-t border-slate-100 mt-2 pt-2">
                     <button
                       onClick={() => {
+                        dispatch({ type: "SET_DOWNLOAD_MODE", payload: true });
+                        setIsMenuOpen(false);
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm font-medium text-brand hover:bg-brand/5"
+                    >
+                      Download Map Area
+                    </button>
+                  </div>
+
+                  <div className="border-t border-slate-100 mt-2 pt-2">
+                    <button
+                      onClick={() => {
                         handleReset();
                         setIsMenuOpen(false);
                       }}
