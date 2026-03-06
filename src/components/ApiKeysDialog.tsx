@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useModalClose } from "../hooks/useModalClose";
 import { useApp } from "../contexts/AppContext";
 import { CopyButton } from "./CopyButton";
-import { GOOGLE_PROJECT_URL, RADAR_PROJECT_URL } from "../constants/mapSources";
+import { GOOGLE_PROJECT_URL } from "../constants/mapSources";
 
 interface ApiKeysDialogProps {
   onClose: () => void;
@@ -13,9 +13,6 @@ export function ApiKeysDialog({ onClose }: ApiKeysDialogProps) {
   const [googleMapsKey, setGoogleMapsKey] = useState(
     state.apiKeys?.googleMaps || ""
   );
-  const [radarMapsKey, setRadarMapsKey] = useState(
-    state.apiKeys?.radarMaps || ""
-  );
   const { handleOverlayClick } = useModalClose(onClose);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -25,7 +22,6 @@ export function ApiKeysDialog({ onClose }: ApiKeysDialogProps) {
       payload: {
         ...state.apiKeys,
         googleMaps: googleMapsKey,
-        radarMaps: radarMapsKey,
       },
     });
     onClose();
@@ -42,7 +38,6 @@ export function ApiKeysDialog({ onClose }: ApiKeysDialogProps) {
         payload: {},
       });
       setGoogleMapsKey("");
-      setRadarMapsKey("");
     }
   };
 
@@ -97,29 +92,6 @@ export function ApiKeysDialog({ onClose }: ApiKeysDialogProps) {
               />
             </label>
             <CopyButton value={googleMapsKey} label="Google Maps API key" />
-          </div>
-
-          <div className="relative">
-            <label className="block text-sm font-medium text-gray-700">
-              <a
-                href={RADAR_PROJECT_URL}
-                target="_blank"
-                rel="noreferrer"
-                className="text-link"
-              >
-                Radar Maps
-              </a>{" "}
-              API Key
-              <input
-                type="password"
-                autoComplete="off"
-                value={radarMapsKey}
-                onChange={(e) => setRadarMapsKey(e.target.value)}
-                className="mt-1 block w-full rounded-md border border-gray-300 shadow-sm p-2"
-                placeholder="Enter your Radar Maps API key"
-              />
-            </label>
-            <CopyButton value={radarMapsKey} label="Radar Maps API key" />
           </div>
 
           <p className="mt-1 text-sm text-gray-500">

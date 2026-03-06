@@ -2,6 +2,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_THUNDERFOREST_API_KEY: string;
+  readonly VITE_HIGHSIGHT_API_KEY: string;
 }
 
 interface ImportMeta {

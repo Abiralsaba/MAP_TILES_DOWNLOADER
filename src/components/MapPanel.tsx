@@ -4,11 +4,8 @@ import { Panel, MapState } from "../types";
 import { SourceSelector } from "./SourceSelector";
 import { useRef, useState, useEffect } from "react";
 import {
-  MAP_SOURCES,
+  SATELLITE_SOURCES,
   GOOGLE_SOURCES,
-  RADAR_SOURCES,
-  STADIA_SOURCES,
-  THUNDERFOREST_SOURCES,
 } from "../constants/mapSources";
 
 interface MapPanelProps {
@@ -29,11 +26,8 @@ export function MapPanel({ panel, className }: MapPanelProps) {
 
   const source =
     state.customSources[panel.sourceId] ||
-    MAP_SOURCES[panel.sourceId] ||
-    GOOGLE_SOURCES[panel.sourceId] ||
-    RADAR_SOURCES[panel.sourceId] ||
-    STADIA_SOURCES[panel.sourceId] ||
-    THUNDERFOREST_SOURCES[panel.sourceId];
+    SATELLITE_SOURCES[panel.sourceId] ||
+    GOOGLE_SOURCES[panel.sourceId];
 
   function handleMapChange(changes: Partial<typeof state.mapState>) {
     if (panel.synchronized) {
@@ -83,9 +77,8 @@ export function MapPanel({ panel, className }: MapPanelProps) {
   return (
     <div
       ref={panelRef}
-      className={`flex flex-col w-full h-full bg-white rounded-lg shadow-sm overflow-hidden ${
-        className ?? ""
-      }`}
+      className={`flex flex-col w-full h-full bg-white rounded-lg shadow-sm overflow-hidden ${className ?? ""
+        }`}
     >
       <div className="p-1.5 md:p-3 border-b border-slate-200 space-y-1.5 md:space-y-2">
         <div className="flex flex-wrap items-center gap-2 min-w-0">
@@ -159,11 +152,10 @@ export function MapPanel({ panel, className }: MapPanelProps) {
                   payload: { panelId: panel.id },
                 })
               }
-              className={`px-2 py-1 rounded text-xs ${
-                panel.synchronized
+              className={`px-2 py-1 rounded text-xs ${panel.synchronized
                   ? "bg-slate-200 text-slate-900"
                   : "text-slate-600 hover:bg-slate-100"
-              }`}
+                }`}
             >
               <span className="md:hidden">
                 {panel.synchronized ? "Sync" : "Unsync"}

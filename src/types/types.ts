@@ -6,6 +6,7 @@ export interface ApiKeys {
   googleMaps?: string;
   radarMaps?: string;
   stadiaMaps?: string;
+  highSight?: string;
 }
 
 export interface AppState {

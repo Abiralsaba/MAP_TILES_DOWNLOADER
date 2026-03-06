@@ -26,22 +26,21 @@ export function Navbar() {
         <div className="flex flex-col md:flex-row">
           {/* Title Row (mobile) / Left Section (desktop) */}
           <div className="h-12 md:h-14 px-4 flex items-center justify-between md:justify-start md:gap-4 border-b md:border-b-0 border-slate-100">
-            <div className="flex items-center gap-4">
-              <img src="/logo.png" alt="MapMatrix" className="w-8 h-8" />
-              <h1 className="text-lg font-semibold text-slate-900">
-                MapMatrix
+            <div className="flex flex-wrap items-center gap-2 md:gap-4">
+              <img src="/logo.png" alt="MARS ROVER MAP" className="w-8 h-8 rounded" />
+              <h1 className="text-lg font-bold text-slate-900 tracking-wide">
+                MARS ROVER MAP
               </h1>
-              <a
-                className="bg-brand/5 text-brand rounded-full px-3 py-1 text-sm"
-                href="https://veloplanner.com"
-              >
-                by VeloPlanner
-              </a>
+              <span className="bg-brand/10 text-brand rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider">
+                created by CODING HERE
+              </span>
             </div>
 
             <a
-              className="p-1 rounded hover:opacity-80"
-              href="https://github.com/veloplanner/map-matrix"
+              className="p-1 rounded hover:opacity-80 md:ml-2"
+              href="https://github.com/Abiralsaba/MAP_TILES_DOWNLOADER"
+              target="_blank"
+              rel="noopener noreferrer"
               aria-label="GitHub Repository"
             >
               <svg className="w-6 h-6" viewBox="0 0 24 24">

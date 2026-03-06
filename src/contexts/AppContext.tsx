@@ -5,7 +5,11 @@ import {
   useContext,
   useEffect,
 } from "react";
-import { DEFAULT_SOURCE_ID, MAP_SOURCES } from "../constants/mapSources";
+import {
+  DEFAULT_SOURCE_ID,
+  SATELLITE_SOURCES,
+  GOOGLE_SOURCES,
+} from "../constants/mapSources";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 import { useMapHash } from "../hooks/useMapHash";
 import {
@@ -18,7 +22,7 @@ import {
 
 function getInitialPanels() {
   // Get available source IDs excluding the default one
-  const availableSources = Object.keys(MAP_SOURCES);
+  const availableSources = Object.keys(SATELLITE_SOURCES);
 
   // Create 4 panels with unique sources where possible
   return Array.from({ length: 4 }, (_, index) => ({
@@ -30,7 +34,7 @@ function getInitialPanels() {
 }
 
 function findUnusedSource(usedSources: string[]): string {
-  const unusedSource = Object.keys(MAP_SOURCES).find(
+  const unusedSource = Object.keys(SATELLITE_SOURCES).find(
     (sourceId) => !usedSources.includes(sourceId)
   );
   if (unusedSource === undefined) {
@@ -57,25 +61,25 @@ const initialState: AppState = {
   apiKeys: {},
 };
 
-const STORAGE_KEY = "mapmatrix-state";
+const STORAGE_KEY = "marsrovermap-state";
 
 type Action =
   | { type: "SET_BOX_COUNT"; payload: BoxCount }
   | { type: "TOGGLE_TOOLBAR" }
   | { type: "UPDATE_MAP_STATE"; payload: Partial<MapState> }
   | {
-      type: "UPDATE_PANEL_SOURCE";
-      payload: { panelId: string; sourceId: string };
-    }
+    type: "UPDATE_PANEL_SOURCE";
+    payload: { panelId: string; sourceId: string };
+  }
   | { type: "TOGGLE_PANEL_SYNC"; payload: { panelId: string } }
   | {
-      type: "UPDATE_PANEL_LOCAL_STATE";
-      payload: { panelId: string; mapState: MapState };
-    }
+    type: "UPDATE_PANEL_LOCAL_STATE";
+    payload: { panelId: string; mapState: MapState };
+  }
   | {
-      type: "ADD_CUSTOM_SOURCE";
-      payload: { id: string; source: CustomMapSource };
-    }
+    type: "ADD_CUSTOM_SOURCE";
+    payload: { id: string; source: CustomMapSource };
+  }
   | { type: "UPDATE_API_KEYS"; payload: ApiKeys }
   | { type: "RESET_STATE" }
   | { type: "REMOVE_CUSTOM_SOURCE"; payload: string };
@@ -157,10 +161,10 @@ function appReducer(state: AppState, action: Action): AppState {
         panels: state.panels.map((panel) =>
           panel.id === action.payload.panelId
             ? {
-                ...panel,
-                synchronized: !panel.synchronized,
-                localMapState: state.mapState,
-              }
+              ...panel,
+              synchronized: !panel.synchronized,
+              localMapState: state.mapState,
+            }
             : panel
         ),
       };
@@ -224,6 +228,28 @@ export function AppProvider({ children }: { children: ReactNode }) {
     STORAGE_KEY,
     initialState
   );
+
+  // Validate loaded state against available sources
+  useEffect(() => {
+    const validSources = new Set([
+      ...Object.keys(SATELLITE_SOURCES),
+      ...Object.keys(GOOGLE_SOURCES),
+      ...Object.keys(state.customSources || {})
+    ]);
+
+    let needsUpdate = false;
+    const validatedPanels = state.panels.map(panel => {
+      if (!validSources.has(panel.sourceId)) {
+        needsUpdate = true;
+        return { ...panel, sourceId: DEFAULT_SOURCE_ID };
+      }
+      return panel;
+    });
+
+    if (needsUpdate) {
+      setState(prev => ({ ...prev, panels: validatedPanels }));
+    }
+  }, [state.panels, state.customSources, setState]);
 
   const hashState = useMapHash(state.mapState);
 

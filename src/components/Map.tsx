@@ -11,10 +11,7 @@ import { SourceSpecification } from "maplibre-gl";
 import { ApiKeys, MapState, VectorSource } from "../types";
 import {
   GOOGLE_SOURCES,
-  RADAR_SOURCES,
-  MAP_SOURCES,
-  STADIA_SOURCES,
-  THUNDERFOREST_SOURCES,
+  SATELLITE_SOURCES,
 } from "../constants/mapSources";
 import { useApp } from "../contexts/AppContext";
 import { MapContextMenu } from "./MapContextMenu";
@@ -63,11 +60,8 @@ export function Map({
   const { state } = useApp();
   const source =
     state.customSources[sourceId] ||
-    MAP_SOURCES[sourceId] ||
-    GOOGLE_SOURCES[sourceId] ||
-    RADAR_SOURCES[sourceId] ||
-    STADIA_SOURCES[sourceId] ||
-    THUNDERFOREST_SOURCES[sourceId];
+    SATELLITE_SOURCES[sourceId] ||
+    GOOGLE_SOURCES[sourceId];
 
   if (!source) {
     return (
